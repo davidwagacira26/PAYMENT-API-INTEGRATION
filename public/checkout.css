@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;1,600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+html, body {
+  min-height: 100vh;
+  display: flex;
+  width: 100%;
+  background: #f4f4f4;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkout-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .2);
+  border-radius: 8px;
+}
+
+.panel-body {
+  padding: 30px;
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2e2e2e;
+  font-size: 24px;
+}
+
+.payment-method {
+  display: flex;
+  margin-bottom: 20px;
+  justify-content: space-between;
+}
+
+.method {
+  display: flex;
+  flex-direction: column;
+  width: 48%;
+  height: 100px;
+  padding: 10px;
+  cursor: pointer;
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.method:hover, .method:focus {
+  border-color: #fc00ac;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(252, 0, 172, 0.2);
+}
+
+.card-logos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-logos img, .method.mpesa img {
+  width: 40px;
+  height: auto;
+}
+
+.payment-text {
+  margin-top: 10px;
+  color: #2e2e2e;
+  font-size: 14px;
+}
+
+.input-fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-fields label {
+  display: block;
+  margin-bottom: 5px;
+  color: #000000;
+  font-weight: 500;
+}
+
+input[type='text'],
+input[type='password'],
+input[type='tel'],
+input[type='number'] {
+  font-size: 16px;
+  width: 100%;
+  height: 40px;
+  padding: 0 10px;
+  color: rgba(46, 46, 46, .8);
+  border: 1px solid #e1e1e1;
+  border-radius: 4px;
+  outline: none;
+  margin-bottom: 15px;
+}
+
+input[type='text']:focus,
+input[type='password']:focus,
+input[type='tel']:focus,
+input[type='number']:focus {
+  border-color: #fc00ac;
+}
+
+.small-inputs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.small-inputs div {
+  width: 48%;
+}
+
+.btn {
+  font-size: 16px;
+  width: 100%;
+  height: 50px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #fc00ac;
+  color: #fff;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #e000a0;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(252, 0, 172, 0.4);
+}
+
+.payment-form {
+  margin-top: 20px;
+}
+
+.card-input-wrapper {
+  position: relative;
+}
+
+#card-type-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: auto;
+}
+
+@media (max-width: 500px) {
+  .checkout-panel {
+    width: 90%;
+  }
+
+  .method {
+    height: 80px;
+  }
+
+  .card-logos img, .method.mpesa img {
+    width: 30px;
+  }
+
+  .payment-text {
+    font-size: 12px;
+  }
+}

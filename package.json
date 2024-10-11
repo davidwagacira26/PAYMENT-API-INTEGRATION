@@ -1,0 +1,14 @@
+{
+  "name": "checkout",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.1",
+    "pesapal-node": "^1.0.1"
+  }
+}
