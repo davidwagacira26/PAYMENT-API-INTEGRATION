@@ -238,7 +238,7 @@ async function handleCardPayment() {
   const amount = amountInput.value;
 
   if (!cardholderName || !cardNumber || expiryDate.length !== 2 || !cvv || !amount) {
-    throw new Error('Please fill in all card details and amount.');
+    throw new Error('Please fill in all Card details and amount.');
   }
 
   const expiryMonth = expiryDate[0];
