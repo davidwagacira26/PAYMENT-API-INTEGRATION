@@ -323,3 +323,4 @@ async function checkPaymentStatus(checkoutRequestID) {
 function showError(message) {
   alert(message);
 }
+

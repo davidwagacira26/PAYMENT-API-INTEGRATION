@@ -117,7 +117,7 @@ async function initiateSTKPush(accessToken, phoneNumber, amount) {
     PartyA: parseInt(formattedPhoneNumber),
     PartyB: parseInt(shortCode),
     PhoneNumber: parseInt(formattedPhoneNumber),
-    CallBackURL: "https://ngese.requestcatcher.com/test",
+    CallBackURL: "https://donatelive.requestcatcher.com/test",
     AccountReference: "PdreamsLtd",
     TransactionDesc: "Payment"
   };
