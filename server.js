@@ -21,6 +21,9 @@ app.get('/checkout', (req, res) => {
 app.post('/initiate-payment', async (req, res) => {
   try {
     const { phoneNumber, amount } = req.body;
+    if (!phoneNumber || !amount) {
+      return res.status(400).json({ error: 'Phone number and amount are required' });
+    }
     const accessToken = await getAccessToken();
     const stkPushResponse = await initiateSTKPush(accessToken, phoneNumber, amount);
     res.json(stkPushResponse);
@@ -38,18 +41,23 @@ app.post('/mpesa-callback', (req, res) => {
   if (Body && Body.stkCallback) {
     const { ResultCode, ResultDesc, CallbackMetadata } = Body.stkCallback;
 
-    if (ResultCode === 0) {
+    if (ResultCode === 0 && CallbackMetadata && CallbackMetadata.Item) {
       // Successful transaction
       const transactionDetails = {
-        amount: CallbackMetadata.Item.find(item => item.Name === 'Amount').Value,
-        mpesaReceiptNumber: CallbackMetadata.Item.find(item => item.Name === 'MpesaReceiptNumber').Value,
-        transactionDate: CallbackMetadata.Item.find(item => item.Name === 'TransactionDate').Value,
-        phoneNumber: CallbackMetadata.Item.find(item => item.Name === 'PhoneNumber').Value
+        amount: CallbackMetadata.Item.find(item => item.Name === 'Amount')?.Value,
+        mpesaReceiptNumber: CallbackMetadata.Item.find(item => item.Name === 'MpesaReceiptNumber')?.Value,
+        transactionDate: CallbackMetadata.Item.find(item => item.Name === 'TransactionDate')?.Value,
+        phoneNumber: CallbackMetadata.Item.find(item => item.Name === 'PhoneNumber')?.Value
       };
 
-      console.log('Successful M-Pesa transaction:', transactionDetails);
-      // Here you would typically update your database with the transaction details
-      res.json({ success: true, message: 'Payment successful', details: transactionDetails });
+      if (Object.values(transactionDetails).every(Boolean)) {
+        console.log('Successful M-Pesa transaction:', transactionDetails);
+        // Here you would typically update your database with the transaction details
+        res.json({ success: true, message: 'Payment successful', details: transactionDetails });
+      } else {
+        console.log('Incomplete transaction details:', transactionDetails);
+        res.status(400).json({ error: 'Incomplete transaction details' });
+      }
     } else {
       // Failed or canceled transaction
       console.log('M-Pesa transaction failed or canceled:', ResultDesc);
@@ -109,15 +117,15 @@ async function initiateSTKPush(accessToken, phoneNumber, amount) {
   const formattedPhoneNumber = phoneNumber.replace(/[+\s]/g, '');
 
   const requestBody = {
-    BusinessShortCode: parseInt(shortCode),
+    BusinessShortCode: shortCode,
     Password: password,
     Timestamp: timestamp,
     TransactionType: "CustomerPayBillOnline",
-    Amount: parseInt(amount),
-    PartyA: parseInt(formattedPhoneNumber),
-    PartyB: parseInt(shortCode),
-    PhoneNumber: parseInt(formattedPhoneNumber),
-    CallBackURL: "https://donatelive.requestcatcher.com/test",
+    Amount: amount,
+    PartyA: formattedPhoneNumber,
+    PartyB: shortCode,
+    PhoneNumber: formattedPhoneNumber,
+    CallBackURL: process.env.MPESA_CALLBACK_URL || "https://donatelive.requestcatcher.com/test",
     AccountReference: "PdreamsLtd",
     TransactionDesc: "Payment"
   };
@@ -157,11 +165,12 @@ app.post('/initiate-pesapal-payment', async (req, res) => {
       last_name,
       email,
       phonenumber,
-      card_number,
-      expiry_month,
-      expiry_year,
-      cvv
     } = req.body;
+
+    // Validate required fields
+    if (!amount || !description || !type || !reference || !first_name || !last_name || !email || !phonenumber) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
 
     const pesapalResponse = await initiatePesaPalPayment(
       amount,
@@ -171,11 +180,7 @@ app.post('/initiate-pesapal-payment', async (req, res) => {
       first_name,
       last_name,
       email,
-      phonenumber,
-      card_number,
-      expiry_month,
-      expiry_year,
-      cvv
+      phonenumber
     );
 
     res.json(pesapalResponse);
@@ -193,11 +198,7 @@ async function initiatePesaPalPayment(
   first_name,
   last_name,
   email,
-  phonenumber,
-  card_number,
-  expiry_month,
-  expiry_year,
-  cvv
+  phonenumber
 ) {
   const pesapalConsumerKey = process.env.PESAPAL_CONSUMER_KEY;
   const pesapalConsumerSecret = process.env.PESAPAL_CONSUMER_SECRET;
@@ -207,7 +208,7 @@ async function initiatePesaPalPayment(
     throw new Error('PesaPal consumer key or secret is not set in the environment variables');
   }
 
-  const callback_url = 'https://your-domain.com/pesapal-callback';
+  const callback_url = process.env.PESAPAL_CALLBACK_URL || 'https://your-domain.com/pesapal-callback';
 
   const post_xml = `<?xml version="1.0" encoding="utf-8"?>
     <PesapalDirectOrderInfo
@@ -280,8 +281,10 @@ app.listen(PORT, () => {
     MPESA_CONSUMER_SECRET: process.env.MPESA_CONSUMER_SECRET ? 'Set' : 'Not set',
     MPESA_SHORTCODE: process.env.MPESA_SHORTCODE ? 'Set' : 'Not set',
     MPESA_PASSKEY: process.env.MPESA_PASSKEY ? 'Set' : 'Not set',
+    MPESA_CALLBACK_URL: process.env.MPESA_CALLBACK_URL ? 'Set' : 'Not set',
     PESAPAL_CONSUMER_KEY: process.env.PESAPAL_CONSUMER_KEY ? 'Set' : 'Not set',
     PESAPAL_CONSUMER_SECRET: process.env.PESAPAL_CONSUMER_SECRET ? 'Set' : 'Not set',
-    PESAPAL_IPN_ID: process.env.PESAPAL_IPN_ID ? 'Set' : 'Not set (optional)'
+    PESAPAL_IPN_ID: process.env.PESAPAL_IPN_ID ? 'Set' : 'Not set (optional)',
+    PESAPAL_CALLBACK_URL: process.env.PESAPAL_CALLBACK_URL ? 'Set' : 'Not set'
   });
 });
